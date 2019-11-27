@@ -1,0 +1,21 @@
+{% extends "Algorthims/base.html" %}
+{% block content %}
+{% for i in SearchingAlgorthims%}
+
+<a href = "earchingAlgorthims/Patternsearching/" <p> {{i.Algorthim_name}} </p> </a>
+<br>
+
+<a href = "/Home" <footer class ="footer"> {{i.Category}}</footer>  </a>
+<style>
+.footer {
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   background-color: black;
+   color: white;
+   text-align: center;
+}
+</style>
+{% endfor %}
+{% endblock %}
