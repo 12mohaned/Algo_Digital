@@ -12,4 +12,6 @@ and Sharing Knowledge
 this Project to use and extends my knowledge more about Django Framework and Python 
 
 
-# url : 
+Note :- 
+
+in case of Any problem running the server try to make python manage.py makemigrations then python manage.py migrate to save the changes in model.py 
