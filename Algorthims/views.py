@@ -5,9 +5,9 @@ from django.http import HttpResponse
 from .models import Algorthim, Algorthim_Category, users, Post
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from .forms import SignupForm, WritePostForm
 from datetime import datetime
-
 #return to the home page
 def Home(request):
     return render(request =request,template_name ="Algorthims/Home.html",
@@ -62,7 +62,7 @@ def Login_request(request):
 def Blog(request):
     if(not request.user.is_authenticated):
         return HttpResponse("Blog Can't be accessed without logging in, you can log in here")
-    return render(request,"Algorthims/Blog.html")
+    return render(request,"Algorthims/Blog.html",{"Posts":Post.objects.all})
 
 def Write_Post(request):
     Form = WritePostForm()
@@ -74,6 +74,41 @@ def Write_Post(request):
             now = datetime.now()
             post.published_Date = now
             post.save()
+            return render(request,"Algorthims/Blog.html")
         else:
             Form = WritePostForm()
-    return render(request,"Algorthims/WritePost.html",{"Form":Form,"Posts":Post.objects.all})
+    return render(request,"Algorthims/WritePost.html",{"Form":Form})
+#Method Responsible for Updating the BioGraphy Info
+@login_required
+def profile(request):
+    if(users.objects.get(Username = request.user) is None):
+        PersonalInformation = users(Username = request.user)
+        PersonalInformation.save()
+    PersonalInformation = users.objects.get(Username = request.user)
+    user_Profession = PersonalInformation.Profession
+    user_BioGraphy = PersonalInformation.Biography
+    user_gitAccount = PersonalInformation.GitAccount
+    user_birthDate = PersonalInformation.BirthDate
+    if(request.method == "POST"):
+        if(request.POST.get("Biography")):
+            BioGraphy = request.POST.get('Biography')
+            PersonalInformation.Biography = BioGraphy
+            user_BioGraphy  = PersonalInformation.Biography
+
+        if(request.POST.get("Profession")):
+            Profession = request.POST.get('Profession')
+            PersonalInformation.Profession = Profession
+            user_Profession = PersonalInformation.Profession
+
+        if(request.POST.get("Git_Account")):
+            GitAccount = request.POST.get('Git_Account')
+            PersonalInformation.GitAccount = GitAccount
+            user_gitAccount = PersonalInformation.GitAccount
+
+        if(request.POST.get("BirthDate")):
+            Birthdate   = request.POST.get('BirthDate')
+            PersonalInformation.BirthDate = Birthdate
+            user_birthDate  = PersonalInformation.BirthDate
+        PersonalInformation.save()
+    return render(request,"Algorthims/Profile.html",{"Prof":user_Profession,"Biography":user_BioGraphy
+            ,"BirthDate":user_birthDate,"GitAccount":user_gitAccount})
