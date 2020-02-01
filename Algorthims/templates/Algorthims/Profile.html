@@ -1,0 +1,75 @@
+{% extends "Algorthims/base.html" %}
+{% block content %}
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+<div class="container">
+
+	<div class="row">
+		<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
+    	 <div class="well profile">
+            <div class="col-sm-12">
+                <div class="col-xs-12 col-sm-8">
+                <h2 id = "User">{{user.username}}</h2>
+                </div>
+                <div class="col-xs-12 col-sm-4 text-center">
+                </div>
+            </div>
+    	 </div>
+		</div>
+	</div>
+</div>
+<div >
+<form method="post" action ="">
+{% csrf_token %}
+<div id = "PersonalForm">
+	<input id ="Bio" type = "textarea" name = "Biography" placeholder="Biography" value="{{Biography}}" />
+<br>
+<br>
+<input type = "textarea" name = "Profession" placeholder="Profession" value="{{Prof}}" />
+<br>
+<br>
+<br>
+<br>
+<input type = "textarea" name = "BirthDate" placeholder="DD/MM/YYYY" value ="{{BirthDate}}"/>
+<br>
+<br>
+<input type = "textarea" name = "Git_Account" placeholder="Github Account"   value ="{{GitAccount}}"/>
+
+</div>
+<h7 id = "Default_git">the default account of the above field is the developer Github Account check it if you want and feel free to add yours</h7>
+<br>
+<button id = "SaveClass" type="submit" class="btn btn-primary black" onclick="SaveBio()">Save</button>
+</form>
+</div>
+<style>
+#User
+{
+color: black;
+margin-left:-50%;
+font-size:30px;
+}
+#SaveClass {
+   margin-left: -14%;
+   margin-top: 4%;
+   background-color: black;
+   color: white;
+   text-align: center;
+}
+#PersonalForm{
+	margin-left:-20%;
+}
+#Default_git
+{
+margin-left: -20%;
+}
+#Bio
+{
+width:300px;
+height:200px;
+}
+</style>
+
+{% endblock %}
