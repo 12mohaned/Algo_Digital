@@ -8,7 +8,8 @@ and Sharing Knowledge
 - download the Latest Django Framework and (Pip)Python Command Line Interface on your Terminal in case of Unix Software or in   on the Shell in case of Windows 
 - Python Manage.py runserver to run the project on the local Server 
 
-# this Project to use and extends my knowledge more about Django Framework and Python 
+
+this Project to use and extends my knowledge more about Django Framework and Python 
 
 
 # url : 
