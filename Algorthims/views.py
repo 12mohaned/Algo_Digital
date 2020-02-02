@@ -9,9 +9,13 @@ from django.contrib.auth.decorators import login_required
 from .forms import SignupForm, WritePostForm
 from datetime import datetime
 #return to the home page
-Favorite_Posts = []
-for i in Post.objects.all():
-    Favorite_Posts.append(i)
+
+def Posts():
+    Favorite_Posts = []
+    for i in Post.objects.all():
+        Favorite_Posts.append(i)
+    return Favorite_Posts
+
 def Home(request):
     return render(request =request,template_name ="Algorthims/Home.html",
     context = {"Algorthim_Category" : Algorthim_Category.objects.all})
@@ -65,12 +69,16 @@ def Login_request(request):
 def Blog(request):
     if(not request.user.is_authenticated):
         return HttpResponse("Blog Can't be accessed without logging in, you can log in here")
-    Favorite_posts = Post.objects.all
-    for i in Favorite_Posts :
+    Favorite(request)
+    return render(request,"Algorthims/Blog.html",{"Posts":Post.objects.all})
+
+#Method Responsible for Favoriting a post
+def Favorite(request):
+    Favorite_posts = Posts()
+    for i in Favorite_posts :
         if(request.GET.get(i.Title) == "Favorite"):
             Favorites = PostFavorites(Favorite_user =request.user, Favorite_Post = i)
             Favorites.save()
-    return render(request,"Algorthims/Blog.html",{"Posts":Post.objects.all})
 
 #method Responsible for posting a post on the website
 def Write_Post(request):
@@ -88,7 +96,16 @@ def Write_Post(request):
             Form = WritePostForm()
     return render(request,"Algorthims/WritePost.html",{"Form":Form})
 
-#Method Responsible for Updating and inserting user extra info
+#Display User Favorite Posts on his/her Profile
+def users_Favorites(request):
+    favoriteLists = []
+    for favoritepost in PostFavorites.objects.all():
+        if(favoritepost.Favorite_user == request.user):
+            favoriteLists.append(favoritepost)
+    return favoriteLists
+
+
+#Renders the user profile with updating his/her info and showing his Favorite Posts Recentely added
 @login_required
 def profile(request):
     if(users.objects.get(Username = request.user) is None):
@@ -120,6 +137,7 @@ def profile(request):
             PersonalInformation.BirthDate = Birthdate
             user_birthDate  = PersonalInformation.BirthDate
         PersonalInformation.save()
-
+        
+    FavoritesList =users_Favorites(request)
     return render(request,"Algorthims/Profile.html",{"Prof":user_Profession,"Biography":user_BioGraphy
-            ,"BirthDate":user_birthDate,"GitAccount":user_gitAccount})
+            ,"BirthDate":user_birthDate,"GitAccount":user_gitAccount,"FavoritesList":FavoritesList})
