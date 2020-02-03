@@ -44,7 +44,21 @@
 <button id = "SaveClass" type="submit" class="btn btn-primary black" onclick="SaveBio()">Save</button>
 </form>
 </div>
+<div id = "list-group">
+	<ul class="collection with-header">
+			 <li class="collection-header"><h4>Favorite Posts</h4></li>
+			 {% for FavPost in FavoritesList %}
+		 <li class="collection-item" >{{FavPost.Favorite_Post}}</li>
+			 {% endfor %}
+		 </ul>
+</div>
 <style>
+#list-group
+{
+margin-left :81.5%;
+margin-top: -62%;
+width:400px;
+}
 #User
 {
 color: black;
