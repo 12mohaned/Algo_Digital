@@ -5,6 +5,7 @@ from django.db import models
 from django.forms import ModelForm
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.contrib.auth.models import User
+
 class Algorthim_Category(models.Model):
     Category_name = models.CharField(max_length = 20, primary_key = True)
     Category_description = models.TextField()
@@ -23,10 +24,11 @@ class Algorthim(models.Model):
         return self.Algorthim_name
 class users(models.Model):
     Username   = models.CharField(max_length=100, primary_key = True)
-    Email      = models.EmailField()
+    Email      = models.EmailField(max_length = 150)
     Biography  = models.TextField()
-    BirthDate  = models.TimeField()
+    BirthDate  = models.CharField(max_length = 100)
     Profession = models.CharField(max_length=100)
+    GitAccount = models.CharField(max_length=500, default = "https://github.com/12mohaned")
 
     def __str__(self):
         return self.Username
@@ -39,3 +41,24 @@ class Post(models.Model):
     published_Date = models.CharField(max_length = 100)
     class Meta :
         unique_together = ["Title","User"]
+
+    def __str__(self):
+        return self.Title
+
+class PostFavorites(models.Model):
+    Favorite_Post = models.ForeignKey(Post, verbose_name ="Post")
+    Favorite_user = models.ForeignKey(User, verbose_name ="User")
+    class Meta:
+         unique_together = ["Favorite_Post","Favorite_user"]
+    def __str__(self):
+        return "User : " +  self.Favorite_user.username+ " Post:" + self.Favorite_Post.Title
+
+class Comment(models.Model):
+    User_Comment = models.CharField(max_length=100,default=None)
+    Post_User = models.ForeignKey(User, verbose_name = "User_Post")
+    Comment_Content = models.TextField()
+    Post = models.ForeignKey(Post, verbose_name = "Post")
+    Comment_Date = models.CharField(max_length = 100)
+
+    def __str__(self):
+        return "Post :" + self.Post.Title + ", User : " + self.User_Comment
