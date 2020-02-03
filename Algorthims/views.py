@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Algorthim, Algorthim_Category, users, Post, PostFavorites
+from .models import Algorthim, Algorthim_Category, users, Post, PostFavorites,Comment
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import SignupForm, WritePostForm
+from .forms import SignupForm, WritePostForm, CommentForm
 from datetime import datetime
 #return to the home page
 
@@ -70,15 +70,32 @@ def Blog(request):
     if(not request.user.is_authenticated):
         return HttpResponse("Blog Can't be accessed without logging in, you can log in here")
     Favorite(request)
-    return render(request,"Algorthims/Blog.html",{"Posts":Post.objects.all})
+    posts = Posts()
+    Form = CommentForm()
+    for post in posts :
+        if(request.POST.get(post.Title) == "Comment"):
+            if(request.method == "POST"):
+                Form = CommentForm(request.POST)
+                if(Form.is_valid()):
+                    now = datetime.now()
+                    comment =Comment(User_Comment = request.user,Post_User =post.User,
+                    Comment_Content = Form.cleaned_data.get("Comment_Content"),
+                    Post = post, Comment_Date = now)
+                    comment.save()
+                    break
+    return render(request,"Algorthims/Blog.html",{"Posts":Post.objects.all,"Form":Form,"Comments":Comment.objects.all})
 
-#Method Responsible for Favoriting a post
+#Responsible for Favoriting a post
 def Favorite(request):
     Favorite_posts = Posts()
     for i in Favorite_posts :
         if(request.GET.get(i.Title) == "Favorite"):
-            Favorites = PostFavorites(Favorite_user =request.user, Favorite_Post = i)
-            Favorites.save()
+            try:
+                Favorites = PostFavorites(Favorite_user =request.user, Favorite_Post = i)
+                Favorites.save()
+            except:
+                return HttpResponse("You Can't Favorite it twice")
+
 
 #method Responsible for posting a post on the website
 def Write_Post(request):
@@ -105,9 +122,10 @@ def users_Favorites(request):
     return favoriteLists
 
 
-#Renders the user profile with updating his/her info and showing his Favorite Posts Recentely added
+#Method Responsible for Updating and inserting user extra info
 @login_required
 def profile(request):
+    print(request.user)
     if(users.objects.get(Username = request.user) is None):
         PersonalInformation = users(Username = request.user)
         PersonalInformation.save()
@@ -137,7 +155,6 @@ def profile(request):
             PersonalInformation.BirthDate = Birthdate
             user_birthDate  = PersonalInformation.BirthDate
         PersonalInformation.save()
-        
     FavoritesList =users_Favorites(request)
     return render(request,"Algorthims/Profile.html",{"Prof":user_Profession,"Biography":user_BioGraphy
             ,"BirthDate":user_birthDate,"GitAccount":user_gitAccount,"FavoritesList":FavoritesList})
