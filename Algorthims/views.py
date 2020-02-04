@@ -6,9 +6,58 @@ from .models import Algorthim, Algorthim_Category, users, Post, PostFavorites,Co
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .forms import SignupForm, WritePostForm, CommentForm
 from datetime import datetime
+import os
+
+def create_stats(request,Directory):
+    if not os.path.exists(Directory):
+        print("Creating one")
+        os.makedirs(Directory)
+
+def create_data_files(platformName, base_url):
+    queue = platformName+"/queue.txt"
+    crawled = platformName +"/crawled.txt"
+    if not os.path.isfile(queue):
+        write_file(queue,base_url)
+    if not os.path.isfile(crawled):
+        write_file(crawled,base_url)
+
+def write_file(path,data):
+    f = open(path,'w')
+    f.write(data)
+    f.close()
+
+def append_to_file(path,data):
+    with open(path,'a') as file:
+        file.write(data+"\n")
+def delete_file_content(path):
+
+    with open(path,'w'):
+        pass
+create_data_files('Code-Forces','https://codeforces.com/')
+
+# return the Number of Problem solved by the user on coding platform's like Code-Forces, Uva, CodeChef
+def Statistics(request):
+    create_stats(request,"Uva")
+    return render(request,"Algorthims/Stats.html")
 #return to the home page
+def MainPage(request):
+    context = {
+    "Algorthim_Category":Algorthim_Category.objects.all()
+    }
+    return render(request,"Algorthims/Home.html",context)
+
+def Home(request,Category):
+    Selected_Category = Algorthim_Category.objects.get(Category_name = Category)
+    if(Selected_Category is None):
+        return HttpResponse("You have Selected Wrong URL")
+    context = {
+    "SelectedCategory":Selected_Category,
+    "Catgo":Algorthim.objects.get(Category = Selected_Category)
+    }
+    return render(request,"Algorthims/Categories.html",context)
 
 def Posts():
     Favorite_Posts = []
@@ -16,16 +65,6 @@ def Posts():
         Favorite_Posts.append(i)
     return Favorite_Posts
 
-def Home(request):
-    return render(request =request,template_name ="Algorthims/Home.html",
-    context = {"Algorthim_Category" : Algorthim_Category.objects.all})
-
-def Categories(request,Category):
-    Selected_Category = Algorthim_Category.objects.get(Category_name = Category)
-    if(Selected_Category is None):
-        return HttpResponse("Okay")
-    else:
-        return HttpResponse("No")
 
 def Signup(request):
     form = SignupForm()
@@ -43,7 +82,8 @@ def Signup(request):
             return redirect('Algorthims/SignUp.html')
     else :
         form = SignupForm()
-    return render(request,"Algorthims/SignUp.html",context = {"Form":form})
+    context= {"Form":form}
+    return render(request,"Algorthims/SignUp.html",context)
 
 def Logout_request(request):
     logout(request)
@@ -63,7 +103,10 @@ def Login_request(request):
                 return HttpResponse(user)
     else:
         form = AuthenticationForm()
-    return render(request,"Algorthims/Login.html",context ={"Form":form})
+    context ={
+    "Form":form
+    }
+    return render(request,"Algorthims/Login.html",context)
 
 #return all the posts ranked according to the most recent time
 def Blog(request):
@@ -83,7 +126,11 @@ def Blog(request):
                     Post = post, Comment_Date = now)
                     comment.save()
                     break
-    return render(request,"Algorthims/Blog.html",{"Posts":Post.objects.all,"Form":Form,"Comments":Comment.objects.all})
+    context = {
+    "Posts":Post.objects.all,"Form":Form,
+    "Comments":Comment.objects.all
+    }
+    return render(request,"Algorthims/Blog.html",context)
 
 #Responsible for Favoriting a post
 def Favorite(request):
@@ -111,7 +158,8 @@ def Write_Post(request):
             return render(request,"Algorthims/Blog.html")
         else:
             Form = WritePostForm()
-    return render(request,"Algorthims/WritePost.html",{"Form":Form})
+    context = {"Form":Form}
+    return render(request,"Algorthims/WritePost.html",context)
 
 #Display User Favorite Posts on his/her Profile
 def users_Favorites(request):
@@ -121,11 +169,12 @@ def users_Favorites(request):
             favoriteLists.append(favoritepost)
     return favoriteLists
 
-
 #Method Responsible for Updating and inserting user extra info
 @login_required
 def profile(request):
-    print(request.user)
+    #user_obj = User.objects.get(username = name)
+    #if(user_obj is None):
+        #return redirect('Algorthims/Home.html')
     if(users.objects.get(Username = request.user) is None):
         PersonalInformation = users(Username = request.user)
         PersonalInformation.save()
@@ -156,5 +205,12 @@ def profile(request):
             user_birthDate  = PersonalInformation.BirthDate
         PersonalInformation.save()
     FavoritesList =users_Favorites(request)
-    return render(request,"Algorthims/Profile.html",{"Prof":user_Profession,"Biography":user_BioGraphy
-            ,"BirthDate":user_birthDate,"GitAccount":user_gitAccount,"FavoritesList":FavoritesList})
+    context = {
+    "Prof":user_Profession,
+    "Biography":user_BioGraphy
+    ,"BirthDate":user_birthDate,
+    "GitAccount":user_gitAccount,
+    "FavoritesList":FavoritesList,
+    #"Users":user_obj
+    }
+    return render(request,"Algorthims/Profile.html",context)
