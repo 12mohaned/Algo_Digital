@@ -11,33 +11,6 @@ from .forms import SignupForm, WritePostForm, CommentForm
 from datetime import datetime
 import os
 
-def create_stats(request,Directory):
-    if not os.path.exists(Directory):
-        print("Creating one")
-        os.makedirs(Directory)
-
-def create_data_files(platformName, base_url):
-    queue = platformName+"/queue.txt"
-    crawled = platformName +"/crawled.txt"
-    if not os.path.isfile(queue):
-        write_file(queue,base_url)
-    if not os.path.isfile(crawled):
-        write_file(crawled,base_url)
-
-def write_file(path,data):
-    f = open(path,'w')
-    f.write(data)
-    f.close()
-
-def append_to_file(path,data):
-    with open(path,'a') as file:
-        file.write(data+"\n")
-def delete_file_content(path):
-
-    with open(path,'w'):
-        pass
-create_data_files('Code-Forces','https://codeforces.com/')
-
 # return the Number of Problem solved by the user on coding platform's like Code-Forces, Uva, CodeChef
 def Statistics(request):
     create_stats(request,"Uva")
