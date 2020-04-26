@@ -8,6 +8,9 @@ public static void main(String[]args)
 {
 
 }
+	/*
+	Testing the Sign-up Function in the Website
+	*/	
 public static void SignUp(String Username, String FirstName,String LastName, String Email,
 		String Password){
 try {
@@ -26,6 +29,9 @@ catch (Exception e)
 System.out.println(e.getMessage());	
 }
 }
+	/*
+	Testing the LogIn Function in the Website
+	*/
 public static void LogIn(String Username, String Password){
 try {
 WebDriver Safari_Driver = new SafariDriver(); 
